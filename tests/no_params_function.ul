@@ -1,0 +1,4 @@
+// This should throw because the function does not have any parameters
+void noArgs {
+
+}

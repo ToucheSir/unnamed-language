@@ -1,0 +1,8 @@
+void main() {
+    ;
+    if (true) {}
+    if (true) {} else {}
+    while (false) {}
+    print "hi";
+    println "hello";
+}

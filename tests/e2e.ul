@@ -1,0 +1,174 @@
+// This file tries to emulate a non-trival program in the language
+// To test interactions between language features
+// As well as the features themselves
+// Adapted (with significant modification) from the mandelbrot set code at
+// https://rosettacode.org/wiki/Mandelbrot_set#C
+// NOTE: This program is only meant to parse, and should not be considered valid beyond that!
+
+float fabs(float f) {
+  if (f < 0.0) {
+    return 0.0 - f;
+  } else {
+    return f;
+  }
+}
+
+// Equivalent to printf("P6\n %s\n %d\n %d\n %d\n",comment,iXmax,iYmax,MaxColorComponentValue);
+void printHeader(string format, string comment, int iXmax, int iYmax, int MaxColorComponentValue) {
+  // FIXME we don't have a printf-style function, so the format string is completely ignored
+  println "P6";
+  print " ";
+  println comment;
+
+  print " ";
+  println iXmax;
+
+  print " ";
+  println iYmax;
+
+  print " ";
+  println MaxColorComponentValue;
+}
+
+// Naive division function that only works w/ positive integers
+int div(int a, int b) {
+  int factor;
+  int remainder;
+  factor = 0;
+  remainder = a;
+
+  while (b < remainder) {
+    remainder = remainder - b;
+    factor = factor + 1;
+  }
+
+  return factor;
+}
+
+// Simple boolean helper
+boolean and(boolean a, boolean b) {
+  // Tests out parser support for if-statments with and without else blocks
+  if (a) {
+    if (b) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  return false;
+}
+
+void printColor(char [3] color) {
+  // TODO don't just print out the array elements
+  print color[0];
+  print color[1];
+  print color[2];
+}
+
+void main() {
+  int iX;
+  int iY;
+  int iXmax;
+  int iYmax;
+
+  float Cx;
+  float Cy;
+  float CxMin;
+  float CxMax;
+  float CyMin;
+  float CyMax;
+
+  string output;
+  float PixelWidth;
+  float PixelHeight;
+
+  // color component ( R or G or B) is coded from 0 to 255
+  // it is 24 bit color RGB file
+  int MaxColorComponentValue;
+  string comment; // comment should start with #
+  char[3] color;
+
+  // Z=Zx+Zy*i  ;   Z0 = 0
+  float Zx;
+  float Zy;
+  // Zx2=Zx*Zx;  Zy2=Zy*Zy
+  float Zx2;
+  float Zy2;
+
+  int Iteration;
+  int IterationMax;
+  // bail-out value, radius of circle;
+  float EscapeRadius;
+  float ER2;
+
+  // Initialization
+  iXmax = 800;
+  iYmax = 800;
+  // No unary negation operator!
+  CxMin=0.0-2.5;
+  CxMax=1.5;
+  CyMin=0.0-2.0;
+  CyMax=2.0;
+  // No binary division operator either!
+  PixelWidth=div(CxMax-CxMin, iXmax);
+  PixelHeight=div(CyMax-CyMin, iYmax);
+
+  MaxColorComponentValue=255;
+  comment="# ";
+
+  IterationMax=200;
+  EscapeRadius=2;
+  ER2=EscapeRadius*EscapeRadius;
+  // End initialization
+
+  // write ASCII header
+  printHeader("P6\n %s\n %d\n %d\n %d\n",comment,iXmax,iYmax,MaxColorComponentValue);
+  // compute and write image data bytes to the file
+  iY=0;
+  while(iY<iYmax)
+  {
+    Cy=CyMin + iY*PixelHeight;
+
+    if (fabs(Cy) < div(PixelHeight, 2)) {
+      Cjy=0.0; // Main antenna
+    }
+
+    iX=0;
+    while (iX<iXmax)
+    {
+      Cx=CxMin + iX*PixelWidth;
+      // initial value of orbit = critical point Z= 0
+      Zx=0.0;
+      Zy=0.0;
+      Zx2=Zx*Zx;
+      Zy2=Zy*Zy;
+      //
+      Iteration = 0;
+      while (and(Iteration<IterationMax, (Zx2+Zy2)<ER2))
+      {
+        Zy=2*Zx*Zy + Cy;
+        Zx=Zx2-Zy2 +Cx;
+        Zx2=Zx*Zx;
+        Zy2=Zy*Zy;
+        Iteration = Iteration + 1;
+      }
+      // compute  pixel color (24 bit = 3 bytes)
+      if (Iteration==IterationMax)
+      { //  interior of Mandelbrot set = black
+        color[0]=0;
+        color[1]=0;
+        color[2]=0;
+      }
+      else
+      { // exterior of Mandelbrot set = white
+        color[0]=255; // Red
+        color[1]=255; // Green
+        color[2]=255; // Blue
+      }
+      // write color to the file
+      printColor(color);
+      iX = iX + 1;
+    }
+    iY = iY + 1;
+  }
+}
