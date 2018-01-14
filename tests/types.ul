@@ -1,0 +1,16 @@
+string main() {
+    int i;
+    float f;
+    char c;
+    string s;
+    boolean b;
+}
+
+void takesAllTypes(int i, float f, char c, string s, boolean b) {}
+
+int returnsInt() {}
+float returnsFloat() {}
+char returnsChar() {}
+string returnsString() {}
+boolean returnsBoolean() {}
+

@@ -1,5 +1,3 @@
-import com.sun.deploy.association.RegisterFailedException;
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
@@ -23,9 +21,18 @@ public class ParserTestHarness {
     }
 
     @Test
+    public void testTypes() throws IOException, RecognitionException {
+        runParser("tests/types.ul");
+    }
+
+    @Test
     public void testBasicStatement() throws IOException, RecognitionException {
         runParser("tests/basic_statement.ul");
+    }
 
+    @Test
+    public void testLiterals() throws IOException, RecognitionException {
+        runParser("tests/literals.ul");
     }
 
     @Test
@@ -36,6 +43,11 @@ public class ParserTestHarness {
     @Test
     public void testComplexFunction() throws IOException, RecognitionException {
         runParser("tests/complex_function.ul");
+    }
+
+    @Test
+    public void testWhitespace() throws IOException, RecognitionException {
+        runParser("tests/whitespace.ul");
     }
 
     @Test
@@ -57,6 +69,11 @@ public class ParserTestHarness {
     @Test(expected = RecognitionException.class)
     public void testNoParamsFunction() throws IOException, RecognitionException {
         runParser("tests/no_params_function.ul");
+    }
+
+    @Test(expected = RecognitionException.class)
+    public void testInvalidTypeDecl() throws IOException, RecognitionException {
+        runParser("tests/invalid_type_decl.ul");
     }
 
     @Test(expected = RecognitionException.class)

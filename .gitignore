@@ -1,3 +1,4 @@
-out
-output
-classes
+out/
+output/
+classes/
+.idea/

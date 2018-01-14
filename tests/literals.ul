@@ -1,0 +1,54 @@
+void main() {
+    // Booleans
+    true;
+    false;
+
+    // Integers
+    0;
+    1;
+    42;
+    1234567890;
+
+    // Floats
+    0.0;
+    1.0;
+    42.0;
+    1234567890.0;
+    0.12345;
+    1.2345;
+    12.345;
+    // Shorthand notation
+    .0;
+    .1;
+    .21345;
+    // Scientific notation
+    0.0E25;
+    .0E-24;
+    .1E12;
+    5E1;
+
+    // Characters
+    '0';
+    'a';
+    '_';
+    '\t';
+    '\n';
+    '\0';
+    '\\';
+    // Unicode literals
+    '\u2012';
+
+    // Strings
+    "";
+    "0";
+    "a";
+    "_";
+    "\t";
+    "\n";
+    "\0";
+    "\\";
+    "string";
+    // Unicode literals
+    "\u2011\u2012";
+    "The quick brown fox jumped over the lazy dog";
+}

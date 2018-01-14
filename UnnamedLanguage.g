@@ -16,8 +16,8 @@ tokens {
 	KW_BOOLEAN   = 'boolean';
 	KW_VOID		   = 'void';
 }
-/*
-*/
+///*
+
 @members
 {
 protected void mismatch (IntStream input, int ttype, BitSet follow)
@@ -41,10 +41,10 @@ public void recoverFromMismatchedSet (IntStream input,
                 throw ex;
         }
 }
-/*
-*/   	
+
+//*/
 program
-	:	function+ ;
+	:	function+ EOF;
 
 function
 	:	functionDecl functionBody ;
@@ -95,43 +95,26 @@ block
 	:	'{' statement* '}' ;
 
 expr
-	: expr2 exprEquals ;
+	: exprEquals ;
 
 exprEquals
-	:	OP_EQUALS expr2 exprEquals
-	|
-	;
-
-expr2
-	:	expr3 exprLessThan
+	: exprLessThan (OP_EQUALS exprLessThan)*
 	;
 
 exprLessThan
-	: OP_LESSTHAN expr3 exprLessThan
-	|
-	;
-
-expr3
-	:	expr4 exprPlusMinus
+	: exprPlusMinus (OP_LESSTHAN exprPlusMinus)*
 	;
 
 exprPlusMinus
-	:	OP_PLUS expr4 exprPlusMinus
-	| OP_MINUS expr4 exprPlusMinus
-	|
+	: exprMul ((OP_PLUS|OP_MINUS) exprMul)*
 	;
 
-expr4
-	:	expr5 exprMul
-	;
-	
 exprMul
-	: OP_MUL expr5 exprMul
-	|
+	: atom (OP_MUL atom)*
 	;
 	
-expr5
-	:	identifier '[' expr ']' 
+atom
+	: identifier '[' expr ']'
 	| identifier '(' exprList ')' 
 	| identifier 
 	| literal 
