@@ -1,4 +1,8 @@
 out/
 output/
 classes/
+build/
 .idea/
+.gradle
+*.iml
+*.class
