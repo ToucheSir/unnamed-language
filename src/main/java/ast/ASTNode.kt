@@ -28,7 +28,6 @@ class FormalParameterList {
 }
 
 class Declaration(type: TypeNode, name: Identifier)
-class FunctionDeclaration(val returnType: TypeNode, val name: Identifier, val parameters: FormalParameterList)
 
 sealed class Expression
 class EqualityExpression(lhs: Expression, rhs: Expression) : Expression()
@@ -69,14 +68,17 @@ class ArrayAssignment(name: Identifier, index: Expression, value: Expression) : 
 class AssignmentStatement(type: AssignmentType) : Statement()
 class ExpressionStatement(expr: Expression) : Statement()
 
-class FunctionBody(varDecls: List<Declaration>)
 
-class Function(val declaration: FunctionDeclaration, val body: FunctionBody) {
 
-}
+sealed class ASTNode
 
-class Program {
+class Program: ASTNode() {
     val functionList = mutableListOf<Function>()
 
     fun addElement(f: Function) = functionList.add(f)
 }
+data class Function(val declaration: FunctionDeclaration, val body: FunctionBody): ASTNode()
+data class FunctionDeclaration(val returnType: TypeNode,
+                               val name: Identifier,
+                               val parameters: FormalParameterList): ASTNode()
+data class FunctionBody(val varDecls: List<Declaration>): ASTNode()
