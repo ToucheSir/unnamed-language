@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+scriptdir="${0%/*}"
+$scriptdir/../build/install/unnamed-language/bin/unnamed-language "$@"

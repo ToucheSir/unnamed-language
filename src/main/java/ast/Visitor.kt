@@ -63,7 +63,7 @@ interface Visitor<out T> {
     class AssignmentStatement(type: AssignmentType) : Statement()
     class ExpressionStatement(expr: Expression) : Statement()
 
-    class FunctionBody(varDecls: List<Declaration>)
+    class FunctionBody(declarations: List<Declaration>)
 
     class Function(val declaration: FunctionDeclaration, val body: FunctionBody) {
 

@@ -55,7 +55,7 @@ tokens {
 
 program returns [Program prog]
     @init { prog = new Program(); }
-    : (f = function { prog.addElement(f); })+ EOF
+    : (f = function { prog.add(f); })+ EOF
     ;
 
 function returns [Function f]
@@ -92,21 +92,21 @@ moreFormals returns [FormalParameter param]
     
 functionBody returns [FunctionBody fb]
     @init {
-        List<Declaration> decls = new ArrayList<>();
-        List<Statement> statements = new ArrayList<>();
+        VariableDeclarationList declarations = new VariableDeclarationList();
+        StatementList statements = new StatementList();
     }
     : '{'
-    (decl = varDecl { decls.add(decl); })*
-    (s = statement { if (s != null) statements.add(s); })*
+    (decl = varDecl { declarations.add(decl); })*
+    (stmt = statement { if (stmt != null) statements.add(stmt); })*
     '}'
-    { fb = new FunctionBody(decls); }
+    { fb = new FunctionBody(declarations, statements); }
     ;
 
-varDecl returns [Declaration decl]
+varDecl returns [VariableDeclaration decl]
     :
     t = compoundType
     id = identifier ';'
-    { decl = new Declaration(t, id); }
+    { decl = new VariableDeclaration(t, id); }
     ;
 
 compoundType returns [TypeNode tn]
@@ -117,12 +117,12 @@ compoundType returns [TypeNode tn]
     ;
 
 type returns [Type t]
-    : KW_INT     { t = new IntegerType(); }
-    | KW_FLOAT   { t = new FloatType(); }
-    | KW_CHAR    { t = new CharType(); }
-    | KW_STRING  { t = new StringType(); }
-    | KW_BOOLEAN { t = new BooleanType(); }
-    | KW_VOID    { t = new VoidType(); }
+    : KW_INT     { t = IntegerType.INSTANCE; }
+    | KW_FLOAT   { t = FloatType.INSTANCE; }
+    | KW_CHAR    { t = CharType.INSTANCE; }
+    | KW_STRING  { t = StringType.INSTANCE; }
+    | KW_BOOLEAN { t = BooleanType.INSTANCE; }
+    | KW_VOID    { t = VoidType.INSTANCE; }
     ;
     
 statement returns [Statement s] options {backtrack=true;}
@@ -158,10 +158,10 @@ returnStatement returns [Statement s]
     { s = new ReturnStatement(retVal); }
     ;
 assignmentStatement returns [Statement s]
-    : (name = identifier) '=' (value = expr) ';'
-    { s = new AssignmentStatement(new VariableAssignment(name, value)); }
-    | (name = identifier) '[' (index = expr) ']' '=' (value = expr) ';'
+    : (name = identifier) '[' (index = expr) ']' '=' (value = expr) ';'
     { s = new AssignmentStatement(new ArrayAssignment(name, index, value)); }
+    | (name = identifier) '=' (value = expr) ';'
+    { s = new AssignmentStatement(new VariableAssignment(name, value)); }
     ;
 expressionStatement returns [Statement s]
     : e = expr ';'
@@ -169,9 +169,8 @@ expressionStatement returns [Statement s]
     ;
 
 block returns [Block b]
-    @init { List<Statement> statements = new ArrayList<>(); }
-    : '{' statement* '}'
-    { b = new Block(); }
+    @init { b = new Block(); }
+    : '{' (s = statement { b.add(s); })* '}'
     ;
 
 expr returns [Expression e]
@@ -202,12 +201,16 @@ exprMul returns [Expression e]
     ;
     
 atom returns [Expression e]
-    @init { e = new Atom(); }
-    : identifier '[' expr ']'
-    | identifier '(' exprList ')' 
-    | identifier 
-    | literal 
-    | '(' expr ')'
+    : name = identifier '[' index = expr ']'
+    { e = new ArrayReference(name, index); }
+    | name = identifier '(' expressions = exprList ')'
+    { e = new FunctionCall(name, expressions); }
+    | id = identifier
+    { e = new IdentifierValue(id); }
+    | l = literal
+    { e = l; }
+    | '(' exp = expr ')'
+    { e = new ParenExpression(exp); }
     ;
 
 literal returns [Literal l]
@@ -219,18 +222,21 @@ literal returns [Literal l]
     | KW_FALSE               { l = new BooleanLiteral(false); }
     ;
 
-exprList
-    : expr exprMore*
+exprList returns [ExpressionList el]
+    @init { el = new ExpressionList(); }
+    : exp = expr { el.add(exp); }
+    (exp = exprMore { el.add(exp); })*
     |
     ;
 
-exprMore
-    : ',' expr
+exprMore returns [Expression e]
+    : ',' exp = expr
+    { e = exp; }
     ;
 
 identifier returns [Identifier id]
-    : ID
-    { id = new Identifier(); }
+    : name = ID
+    { id = new Identifier($name.text); }
     ;
     
 // Lexer Rules
