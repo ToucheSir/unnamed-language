@@ -1,8 +1,8 @@
 out/
-output/
-classes/
 build/
+kotlinc/
+ant/
+lib/
 .idea/
-.gradle
 *.iml
-*.class
+unnamed_language.jar

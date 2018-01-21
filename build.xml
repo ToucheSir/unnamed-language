@@ -1,0 +1,92 @@
+<project name="unnamed_language" default="build">
+    <property name="lib" value="${basedir}/lib"/>
+    <property name="kotlin.lib" value="${basedir}/kotlinc/lib"/>
+
+    <property name="antlr.src.dir" value="src/main/antlr"/>
+    <property name="antlr.build.dir" value="build/generated-src/antlr/main"/>
+
+    <property name="main.build.dir" value="build/classes/main"/>
+    <property name="main.src.dir" value="src/main/java"/>
+    <property name="test.build.dir" value="build/classes/test"/>
+    <property name="test.src.dir" value="src/test/java"/>
+    <property name="test.resources.dir" value="src/test/resources"/>
+
+    <typedef resource="org/jetbrains/kotlin/ant/antlib.xml"
+             classpath="${kotlin.lib}/kotlin-ant.jar"/>
+
+    <path id="classpath">
+        <fileset dir="${lib}" includes="*.jar"/>
+        <fileset dir="${kotlin.lib}" includes="*.jar"/>
+    </path>
+
+    <path id="classpath.test">
+        <path refid="classpath" />
+        <fileset dir="${lib}/test" includes="*.jar"/>
+        <pathelement location="${main.build.dir}"/>
+        <pathelement location="${test.resources.dir}"/>
+    </path>
+
+    <target name="clean">
+        <delete dir="build" failonerror="false"/>
+    </target>
+
+    <target name="antlr">
+        <mkdir dir="build"/>
+        <java classname="org.antlr.Tool" fork="true" failonerror="true">
+            <classpath refid="classpath"/>
+            <arg value="-verbose"/>
+            <arg value="-o"/>
+            <arg path="${antlr.build.dir}"/>
+            <arg path="${antlr.src.dir}/UnnamedLanguage.g"/>
+        </java>
+    </target>
+
+    <target name="build" depends="antlr">
+        <mkdir dir="${main.build.dir}"/>
+        <javac destdir="${main.build.dir}" includeAntRuntime="false">
+            <src>
+                <dirset dir="${main.src.dir}"/>
+                <dirset dir="build/generated-src"/>
+            </src>
+            <classpath refid="classpath"/>
+            <withKotlin/>
+        </javac>
+    </target>
+
+    <target name="build-tests" depends="build">
+        <delete dir="build/classes/test" failonerror="false"/>
+        <mkdir dir="build/classes/test"/>
+        <javac destdir="${test.build.dir}" includeAntRuntime="false">
+            <src>
+                <dirset dir="${test.src.dir}"/>
+            </src>
+            <classpath refid="classpath"/>
+            <classpath refid="classpath.test"/>
+            <withKotlin/>
+        </javac>
+    </target>
+
+    <target name="test" depends="build-tests">
+        <junit printsummary="on" fork="true">
+            <classpath>
+                <path refid="classpath.test"/>
+                <pathelement location="${test.build.dir}"/>
+            </classpath>
+            <formatter type="brief" usefile="false"/>
+            <batchtest>
+                <fileset dir="${test.src.dir}" includes="**/*.java"/>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="package-jar" depends="build">
+        <jar destfile="${ant.project.name}.jar">
+            <manifest>
+                <attribute name="Main-Class" value="Compiler"/>
+            </manifest>
+            <fileset dir="build/classes/main"/>
+            <zipgroupfileset dir="${lib}" includes="*.jar"/>
+            <zipgroupfileset dir="${kotlin.lib}" includes="kotlin-runtime.jar"/>
+        </jar>
+    </target>
+</project>
