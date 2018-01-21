@@ -25,6 +25,7 @@ tokens {
 ///*
 @header {
     import ast.*;
+    import static org.apache.commons.text.StringEscapeUtils.unescapeJava;
 }
 
 @members {
@@ -188,7 +189,7 @@ exprPlusMinus returns [Expression e]
     (op = (OP_PLUS|OP_MINUS) rhs = exprMul {
         if ($op.type == OP_PLUS) {
             e = new AddExpression(e, rhs);
-        } else {
+        } else if ($op.type == OP_MINUS) {
             e = new SubtractExpression(e, rhs);
         }
     })*
@@ -214,10 +215,10 @@ atom returns [Expression e]
     ;
 
 literal returns [Literal l]
-    : s = STRING_CONSTANT    { l = new StringLiteral($s.text); }
+    : s = STRING_CONSTANT    { l = new StringLiteral(unescapeJava($s.text.substring(1, $s.text.length() - 1))); }
     | i = INTEGER_CONSTANT   { l = new IntegerLiteral(Integer.parseInt($i.text)); }
     | f = FLOAT_CONSTANT     { l = new FloatLiteral(Float.parseFloat($f.text)); }
-    | c = CHARACTER_CONSTANT { l = new CharacterLiteral($c.text.charAt(0)); }
+    | c = CHARACTER_CONSTANT { l = new CharacterLiteral(unescapeJava($c.text).charAt(1)); }
     | KW_TRUE                { l = new BooleanLiteral(true); }
     | KW_FALSE               { l = new BooleanLiteral(false); }
     ;

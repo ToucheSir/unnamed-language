@@ -1,5 +1,6 @@
 package ast
 
+import org.apache.commons.text.StringEscapeUtils.escapeJava
 import java.io.PrintStream
 
 class PrettyPrinter(private val out: PrintStream) : ASTConsumer<Unit> {
@@ -181,6 +182,16 @@ class PrettyPrinter(private val out: PrintStream) : ASTConsumer<Unit> {
             emit(')')
         }
         is IdentifierValue -> printTree(expr.id, nestingLevel)
+        is StringLiteral -> {
+            emit('"')
+            emit(escapeJava(expr.value))
+            emit('"')
+        }
+        is CharacterLiteral -> {
+            emit('\'')
+            emit(expr.value)
+            emit('\'')
+        }
         is Literal<*> -> emit(expr.value, nestingLevel)
     }
 }
