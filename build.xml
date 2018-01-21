@@ -11,6 +11,9 @@
     <property name="test.src.dir" value="src/test/java"/>
     <property name="test.resources.dir" value="src/test/resources"/>
 
+    <uptodate property="antlr.upToDate" srcfile="${antlr.src.dir}/UnnamedLanguage.g"
+              targetfile="${antlr.build.dir}/UnnamedLanguage.tokens"/>
+
     <typedef resource="org/jetbrains/kotlin/ant/antlib.xml"
              classpath="${kotlin.lib}/kotlin-ant.jar"/>
 
@@ -30,7 +33,7 @@
         <delete dir="build" failonerror="false"/>
     </target>
 
-    <target name="antlr">
+    <target name="antlr" unless="antlr.upToDate">
         <mkdir dir="build"/>
         <java classname="org.antlr.Tool" fork="true" failonerror="true">
             <classpath refid="classpath"/>
