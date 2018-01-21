@@ -1,20 +1,21 @@
 #
+ANT=ant/bin/ant
 GNAME= UnnamedLanguage
 GSRC= $(GNAME).g
 
 all: grammar compiler
 
-grammar: $(GSRCS)
-	java org.antlr.Tool -fo . $(GSRC)
+grammar:
+	$(ANT) antlr
 
 compiler:
-	javac *.java
+	$(ANT) build
 
 test:
-	java org.junit.runner.JUnitCore ParserTestHarness
+	$(ANT) test
 
 clean:
-	rm *.class $(GNAME)*.java $(GNAME)__.g $(GNAME).tokens
+	$(ANT) clean
 
 
- 
+
