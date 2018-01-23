@@ -7,10 +7,10 @@ class PrettyPrinter(private val out: PrintStream) : ASTConsumer<Unit> {
     override fun process(node: ASTNode) = printTree(node)
 
     private inline fun <reified T> emit(msg: T, nestingLevel: Int = 0) =
-            out.print("    ".repeat(nestingLevel) + msg)
+        out.print("    ".repeat(nestingLevel) + msg)
 
     private inline fun <reified T> emitln(msg: T, nestingLevel: Int = 0) =
-            out.println("    ".repeat(nestingLevel) + msg)
+        out.println("    ".repeat(nestingLevel) + msg)
 
     private fun emitln() = out.println()
 
@@ -81,7 +81,7 @@ class PrettyPrinter(private val out: PrintStream) : ASTConsumer<Unit> {
     }
 
     private fun printStatement(stmt: Statement, nestingLevel: Int = 0): Unit = when (stmt) {
-        is IfStatement -> {
+        is IfStatement -> run {
             emit("if (", nestingLevel)
             printExpression(stmt.cond)
             emitln(")")
@@ -90,7 +90,6 @@ class PrettyPrinter(private val out: PrintStream) : ASTConsumer<Unit> {
                 emitln("else", nestingLevel)
                 printTree(stmt.elseClause, nestingLevel)
             }
-            Unit
         }
         is WhileStatement -> {
             emit("while (", nestingLevel)

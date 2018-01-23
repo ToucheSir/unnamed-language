@@ -23,8 +23,8 @@ class DotPrinter(private val out: PrintStream, private val graphName: String) : 
     private fun allocateNode(label: String): Int {
         val id = counter++
         val escapedLabel = label
-                .replace("\\", "\\\\")
-                .replace("\"", "\\\"")
+            .replace("\\", "\\\\")
+            .replace("\"", "\\\"")
         out.println("$id [shape=box,label=\"$escapedLabel\"]")
         return id
     }

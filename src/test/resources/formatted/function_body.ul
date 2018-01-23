@@ -1,0 +1,26 @@
+void empty() {
+}
+
+void hasDecls() {
+    int a;
+    float b;
+}
+
+void hasStatements() {
+    a = b + 1;
+    println c;
+}
+
+void hasDeclsStatements() {
+    int a;
+    float b;
+    a = b + 1;
+    println c;
+}
+
+void main() {
+    empty();
+    hasDecls();
+    hasStatements();
+    hasDeclsStatements();
+}

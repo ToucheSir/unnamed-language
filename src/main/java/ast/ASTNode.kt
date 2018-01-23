@@ -30,16 +30,16 @@ data class Function(val declaration: FunctionDeclaration, val body: FunctionBody
 sealed class Declaration : ASTNode()
 data class FunctionDeclaration(val returnType: TypeNode,
                                val name: Identifier,
-                               val parameters: FormalParameterList) : Declaration()
+                               val parameters: FormalParameterList = FormalParameterList()) : Declaration()
 
 data class TypeNode(val type: Type) : ASTNode()
 data class Identifier(val name: String) : ASTNode()
 
-class FormalParameter(val type: TypeNode, val name: Identifier) : ASTNode()
+data class FormalParameter(val type: TypeNode, val name: Identifier) : ASTNode()
 data class FormalParameterList(private val parameters: MutableList<FormalParameter> = mutableListOf()) : ASTNodeList<FormalParameter>(parameters)
 
-data class FunctionBody(val declarations: VariableDeclarationList,
-                        val statements: StatementList) : ASTNode()
+data class FunctionBody(val declarations: VariableDeclarationList = VariableDeclarationList(),
+                        val statements: StatementList = StatementList()) : ASTNode()
 
 data class VariableDeclarationList(private val declarations: MutableList<VariableDeclaration> = mutableListOf()) : ASTNodeList<VariableDeclaration>(declarations)
 data class VariableDeclaration(val type: TypeNode, val name: Identifier) : Declaration()
@@ -47,7 +47,7 @@ data class VariableDeclaration(val type: TypeNode, val name: Identifier) : Decla
 data class StatementList(private val statements: MutableList<Statement> = mutableListOf()) : ASTNodeList<Statement>(statements)
 sealed class Statement : ASTNode()
 
-data class IfStatement(val cond: Expression, val thenClause: Block, val elseClause: Block?) : Statement()
+data class IfStatement(val cond: Expression, val thenClause: Block, val elseClause: Block? = null) : Statement()
 data class WhileStatement(val cond: Expression, val body: Block) : Statement()
 data class PrintStatement(val expr: Expression) : Statement()
 data class PrintlnStatement(val expr: Expression) : Statement()
@@ -73,7 +73,7 @@ data class SubtractExpression(override val lhs: Expression, override val rhs: Ex
 data class MultExpression(override val lhs: Expression, override val rhs: Expression) : BinaryExpression(lhs, rhs)
 
 data class ArrayReference(val name: Identifier, val index: Expression) : Expression()
-data class FunctionCall(val name: Identifier, val args: ExpressionList) : Expression()
+data class FunctionCall(val name: Identifier, val args: ExpressionList = ExpressionList()) : Expression()
 data class ExpressionList(private val expressions: MutableList<Expression> = mutableListOf()) : ASTNodeList<Expression>(expressions)
 data class ParenExpression(val inner: Expression) : Expression()
 data class IdentifierValue(val id: Identifier) : Expression()

@@ -60,25 +60,22 @@
         <delete dir="build/classes/test" failonerror="false"/>
         <mkdir dir="build/classes/test"/>
         <javac destdir="${test.build.dir}" includeAntRuntime="false">
+            <classpath refid="classpath.test"/>
+            <withKotlin/>
             <src>
                 <dirset dir="${test.src.dir}"/>
             </src>
-            <classpath refid="classpath"/>
-            <classpath refid="classpath.test"/>
-            <withKotlin/>
         </javac>
     </target>
 
     <target name="test" depends="build-tests">
-        <junit printsummary="on" fork="true">
+        <junit printsummary="on" fork="true" showoutput="true" haltonfailure="yes">
             <classpath>
                 <path refid="classpath.test"/>
                 <pathelement location="${test.build.dir}"/>
             </classpath>
             <formatter type="brief" usefile="false"/>
-            <batchtest>
-                <fileset dir="${test.src.dir}" includes="**/*.java"/>
-            </batchtest>
+            <test name="ParserTestHarness" />
         </junit>
     </target>
 
