@@ -1,0 +1,6 @@
+#!/bin/bash
+# Determine the script directory (since the jar path has to be resolved relatively)
+# Taken from https://stackoverflow.com/a/246128
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+java -jar $DIR/unnamed_language.jar "$@"
