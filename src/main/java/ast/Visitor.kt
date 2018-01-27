@@ -1,5 +1,7 @@
 package ast
 
+import type.*
+
 interface Visitor<out T> {
     fun visit(t: Type): T
     fun visit(t: ArrayType): T

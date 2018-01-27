@@ -25,6 +25,7 @@ tokens {
 ///*
 @header {
     import ast.*;
+    import type.*;
     import static org.apache.commons.text.StringEscapeUtils.unescapeJava;
 }
 

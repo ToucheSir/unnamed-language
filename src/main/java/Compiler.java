@@ -20,9 +20,10 @@ public class Compiler {
         if (args.length == 0) {
             System.out.println("Usage: Test filename.ul");
             return;
-        } else {
-            input = new ANTLRInputStream(new FileInputStream(args[0]));
         }
+
+        String fileName = args[0];
+        input = new ANTLRInputStream(new FileInputStream(fileName));
 
         // The name of the grammar here is "UnnamedLanguage",
         // so ANTLR generates UnnamedLanguageLexer and UnnamedLanguageParser

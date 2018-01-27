@@ -3,13 +3,13 @@ ANT=ant/bin/ant
 GNAME= UnnamedLanguage
 GSRC= $(GNAME).g
 
-all: grammar compiler
+all: compiler
 
 grammar:
 	$(ANT) antlr
 
 compiler:
-	$(ANT) build
+	$(ANT) package-jar
 
 test:
 	$(ANT) test

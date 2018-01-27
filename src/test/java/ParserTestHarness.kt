@@ -1,6 +1,5 @@
 import ast.*
 import ast.dsl.*
-import com.sun.org.apache.xpath.internal.operations.Bool
 import org.antlr.runtime.ANTLRInputStream
 import org.antlr.runtime.CommonTokenStream
 import org.antlr.runtime.RecognitionException
@@ -9,6 +8,7 @@ import org.junit.Test
 import java.io.IOException
 
 import org.junit.Assert.*
+import type.*
 
 class ParserTestHarness {
     // Happy path

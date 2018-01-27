@@ -20,23 +20,35 @@
     <path id="classpath">
         <fileset dir="${lib}" includes="*.jar"/>
         <fileset dir="${kotlin.lib}" includes="*.jar"/>
+        <pathelement location="${main.build.dir}"/>
     </path>
 
     <path id="classpath.test">
-        <path refid="classpath" />
+        <path refid="classpath"/>
         <fileset dir="${lib}/test" includes="*.jar"/>
-        <pathelement location="${main.build.dir}"/>
-        <pathelement location="${test.resources.dir}"/>
     </path>
 
     <target name="clean">
         <delete dir="build" failonerror="false"/>
     </target>
 
-    <target name="antlr" unless="antlr.upToDate">
+    <target name="build-compiler-lib">
+        <mkdir dir="${main.build.dir}"/>
+        <kotlinc output="${main.build.dir}">
+            <src>
+                <dirset dir="${main.src.dir}"/>
+            </src>
+            <classpath refid="classpath"/>
+        </kotlinc>
+    </target>
+
+    <target name="antlr" depends="build-compiler-lib" unless="antlr.upToDate">
         <mkdir dir="build"/>
         <java classname="org.antlr.Tool" fork="true" failonerror="true">
-            <classpath refid="classpath"/>
+            <classpath>
+                <path refid="classpath"/>
+                <fileset dir="${lib}/antlr" includes="*.jar" />
+            </classpath>
             <arg value="-verbose"/>
             <arg value="-o"/>
             <arg path="${antlr.build.dir}"/>
@@ -52,7 +64,6 @@
                 <dirset dir="build/generated-src"/>
             </src>
             <classpath refid="classpath"/>
-            <withKotlin/>
         </javac>
     </target>
 
@@ -69,13 +80,16 @@
     </target>
 
     <target name="test" depends="build-tests">
+        <copy todir="${test.build.dir}">
+            <fileset dir="${test.resources.dir}"/>
+        </copy>
         <junit printsummary="on" fork="true" showoutput="true" haltonfailure="yes">
             <classpath>
                 <path refid="classpath.test"/>
                 <pathelement location="${test.build.dir}"/>
             </classpath>
             <formatter type="brief" usefile="false"/>
-            <test name="ParserTestHarness" />
+            <test name="ParserTestHarness"/>
         </junit>
     </target>
 

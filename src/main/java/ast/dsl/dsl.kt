@@ -2,6 +2,8 @@ package ast.dsl
 
 import ast.*
 import ast.Function
+import type.ArrayType
+import type.Type
 
 fun program(init: Program.() -> Unit): Program {
     val node = Program()
