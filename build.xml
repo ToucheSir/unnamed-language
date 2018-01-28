@@ -12,7 +12,7 @@
     <property name="test.resources.dir" value="src/test/resources"/>
 
     <uptodate property="antlr.upToDate" srcfile="${antlr.src.dir}/UnnamedLanguage.g"
-              targetfile="${antlr.build.dir}/UnnamedLanguage.tokens"/>
+              targetfile="${antlr.build.dir}/parser/UnnamedLanguage.tokens"/>
 
     <typedef resource="org/jetbrains/kotlin/ant/antlib.xml"
              classpath="${kotlin.lib}/kotlin-ant.jar"/>
@@ -43,7 +43,7 @@
     </target>
 
     <target name="antlr" depends="build-compiler-lib" unless="antlr.upToDate">
-        <mkdir dir="build"/>
+        <delete dir="${antlr.build.dir}" failonerror="false"/>
         <java classname="org.antlr.Tool" fork="true" failonerror="true">
             <classpath>
                 <path refid="classpath"/>
@@ -51,7 +51,7 @@
             </classpath>
             <arg value="-verbose"/>
             <arg value="-o"/>
-            <arg path="${antlr.build.dir}"/>
+            <arg path="${antlr.build.dir}/parser"/>
             <arg path="${antlr.src.dir}/UnnamedLanguage.g"/>
         </java>
     </target>
@@ -61,7 +61,7 @@
         <javac destdir="${main.build.dir}" includeAntRuntime="false">
             <src>
                 <dirset dir="${main.src.dir}"/>
-                <dirset dir="build/generated-src"/>
+                <dirset dir="${antlr.build.dir}"/>
             </src>
             <classpath refid="classpath"/>
         </javac>
@@ -89,7 +89,8 @@
                 <pathelement location="${test.build.dir}"/>
             </classpath>
             <formatter type="brief" usefile="false"/>
-            <test name="ParserTestHarness"/>
+            <test name="parser.ParserTestHarness"/>
+            <test name="ast.PrettyPrinterTest"/>
         </junit>
     </target>
 

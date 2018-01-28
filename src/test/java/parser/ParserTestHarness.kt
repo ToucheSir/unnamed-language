@@ -1,3 +1,5 @@
+package parser
+
 import ast.*
 import ast.dsl.*
 import org.antlr.runtime.ANTLRInputStream
@@ -125,13 +127,13 @@ class ParserTestHarness {
                 statement(ExpressionStatement(0.toLit()))
                 statement(ExpressionStatement(1.toLit()))
                 statement(ExpressionStatement(42.toLit()))
-                statement(ExpressionStatement(1234567890.toLit()))
+                statement(ExpressionStatement(12345678.toLit()))
 
                 // Floats
                 statement(ExpressionStatement(0.0f.toLit()))
                 statement(ExpressionStatement(1.0f.toLit()))
                 statement(ExpressionStatement(42.0f.toLit()))
-                statement(ExpressionStatement(1234567890.0f.toLit()))
+                statement(ExpressionStatement(12345678.0f.toLit()))
                 statement(ExpressionStatement(0.12345f.toLit()))
                 statement(ExpressionStatement(1.2345f.toLit()))
                 statement(ExpressionStatement(12.345f.toLit()))
@@ -142,7 +144,7 @@ class ParserTestHarness {
                 // Scientific notation
                 statement(ExpressionStatement(0.0E25f.toLit()))
                 statement(ExpressionStatement(.0E-24f.toLit()))
-                statement(ExpressionStatement(.1E12f.toLit()))
+                statement(ExpressionStatement(.1E11f.toLit()))
                 statement(ExpressionStatement(5E1f.toLit()))
 
                 // Characters

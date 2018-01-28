@@ -23,10 +23,14 @@ tokens {
 }
 
 ///*
-@header {
+@parser::header {
+    package parser;
     import ast.*;
     import type.*;
     import static org.apache.commons.text.StringEscapeUtils.unescapeJava;
+}
+@lexer::header {
+    package parser;
 }
 
 @members {

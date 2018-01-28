@@ -1,3 +1,0 @@
-void main() {
-    print "this should throw"
-}

@@ -15,9 +15,11 @@ class PrettyPrinter(private val out: PrintStream) : ASTConsumer<Unit> {
     private fun emitln() = out.println()
 
     private fun printTree(node: ASTNode, nestingLevel: Int = 0): Unit = when (node) {
-        is Program -> node.forEach {
-            printTree(it)
-            emitln()
+        is Program -> node.forEachIndexed { i, f ->
+            printTree(f)
+            if (i < node.size - 1) {
+                emitln()
+            }
         }
         is Function -> {
             printTree(node.declaration)
@@ -72,7 +74,7 @@ class PrettyPrinter(private val out: PrintStream) : ASTConsumer<Unit> {
             node.forEachIndexed { i, e ->
                 printExpression(e)
                 if (i < node.size - 1) {
-                    emit(", ")
+                    emit(",")
                 }
             }
         }
@@ -182,13 +184,13 @@ class PrettyPrinter(private val out: PrintStream) : ASTConsumer<Unit> {
         }
         is IdentifierValue -> printTree(expr.id, nestingLevel)
         is StringLiteral -> {
-            emit('"')
+            emit('"', nestingLevel)
             emit(escapeJava(expr.value))
             emit('"')
         }
         is CharacterLiteral -> {
             val escaped = escapeJava(expr.value.toString())
-            emit('\'')
+            emit('\'', nestingLevel)
             emit(escaped.removeSurrounding("\""))
             emit('\'')
         }

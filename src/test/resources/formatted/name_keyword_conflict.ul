@@ -1,2 +1,0 @@
-// This should throw because the void keyword was used as a function name
-void void() {}

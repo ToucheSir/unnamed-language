@@ -1,2 +1,0 @@
-// Whitespace is necessary to split the return type and name
-voidmain() { }

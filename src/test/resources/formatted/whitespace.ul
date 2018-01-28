@@ -1,26 +1,21 @@
-// Splitting across lines
-void main(int argc,string[3] argv){println "Hello, world!";}
-
-int
-negate
-(
-int
-i
-)
+void main (int argc, string[3] argv)
 {
-return
-0.0
--
-i
-;
+    println "Hello, world!";
 }
 
-// Shenanigans à la the Obfuscated C Contest
-            boolean
-        and         (
-    boolean a   ,   boolean
-b   )   {   if  (   a   )   {
-    if  (   b   )   {   return
-    true   ;    }   }
-        return  false
-           ; }
+int negate (int i)
+{
+    return 0.0-i;
+}
+
+boolean and (boolean a, boolean b)
+{
+    if (a)
+    {
+        if (b)
+        {
+            return true;
+        }
+    }
+    return false;
+}

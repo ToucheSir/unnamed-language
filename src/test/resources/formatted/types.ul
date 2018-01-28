@@ -1,16 +1,57 @@
-string main() {
+void main ()
+{
     int i;
     float f;
     char c;
     string s;
     boolean b;
+    int[1] is;
+    float[2] fs;
+    char[3] cs;
+    string[4] ss;
+    boolean[5] bs;
 }
 
-void takesAllTypes(int i, float f, char c, string s, boolean b) {}
+void takesAllTypes (int i, float f, char c, string s, boolean b, int[1] is, float[2] fs, char[3] cs, string[4] ss, boolean[5] bs)
+{
+}
 
-int returnsInt() {}
-float returnsFloat() {}
-char returnsChar() {}
-string returnsString() {}
-boolean returnsBoolean() {}
+int returnsInt ()
+{
+}
 
+float returnsFloat ()
+{
+}
+
+char returnsChar ()
+{
+}
+
+string returnsString ()
+{
+}
+
+boolean returnsBoolean ()
+{
+}
+
+int[1] returnsInts ()
+{
+}
+
+float[2] returnsFloats ()
+{
+}
+
+char[3] returnsChars ()
+{
+}
+
+string[4] returnsStrings ()
+{
+}
+
+boolean[5] returnsBooleans ()
+{
+}
