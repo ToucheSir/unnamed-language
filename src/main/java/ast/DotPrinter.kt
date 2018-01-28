@@ -1,6 +1,13 @@
 package ast
 
+import org.apache.commons.text.StringEscapeUtils.escapeJava
 import java.io.PrintStream
+
+private fun escapeStringLiteral(s: String) = s
+    .replace("\\", "\\\\")
+    .replace("\"", "\\\"")
+
+private data class TreeNode(val id: Int, val type: String, var value: String? = null)
 
 class DotPrinter(private val out: PrintStream, private val graphName: String) : ASTConsumer<Unit> {
     private var counter = 0
@@ -14,23 +21,25 @@ class DotPrinter(private val out: PrintStream, private val graphName: String) : 
         out.println("}")
     }
 
-    private fun createNode(label: String, parentId: Int? = null, action: ((Int) -> Unit)? = null) {
-        val id = allocateNode(label)
-        parentId?.let { out.println("$parentId -> $id") }
-        return action?.invoke(id) ?: Unit
+    private fun createNode(
+        label: String,
+        parentId: Int? = null,
+        action: ((TreeNode) -> Unit)? = null
+    ) {
+        val node = allocateNode(label)
+        action?.invoke(node)
+        val escapedType = escapeStringLiteral(node.type)
+        out.print("${node.id} [shape=\"record\",label=\"{$escapedType")
+        node.value?.let { out.print("|${escapeStringLiteral(it)}") }
+        out.println("}\"]")
+        parentId?.let { out.println("$parentId -> ${node.id}") }
     }
 
-    private fun allocateNode(label: String): Int {
-        val id = counter++
-        val escapedLabel = label
-            .replace("\\", "\\\\")
-            .replace("\"", "\\\"")
-        out.println("$id [shape=box,label=\"$escapedLabel\"]")
-        return id
-    }
+    private fun allocateNode(type: String) = TreeNode(counter++, type)
 
     private fun ASTNode.printTree(parentId: Int? = null) {
-        createNode(javaClass.simpleName, parentId) { id ->
+        createNode(javaClass.simpleName, parentId) { node ->
+            val id = node.id
             run {
                 when (this) {
                     is Program -> forEach { it.printTree(id) }
@@ -47,12 +56,8 @@ class DotPrinter(private val out: PrintStream, private val graphName: String) : 
                         type.printTree(id)
                         name.printTree(id)
                     }
-                    is TypeNode -> {
-                        createNode(type.name, id)
-                    }
-                    is Identifier -> {
-                        createNode(name, id)
-                    }
+                    is TypeNode -> node.value = type.name
+                    is Identifier -> node.value = name
                     is FormalParameterList -> forEach { it.printTree(id) }
                     is FormalParameter -> {
                         type.printTree(id)
@@ -66,7 +71,7 @@ class DotPrinter(private val out: PrintStream, private val graphName: String) : 
                     is StatementList -> forEach { it.printTree(id) }
                     is Statement -> printChildren(id)
                     is Block -> forEach { it.printTree(id) }
-                    is Expression -> printChildren(id)
+                    is Expression -> printChildren(node)
                     is ExpressionList -> forEach { it.printTree(id) }
                 }
             }
@@ -104,23 +109,26 @@ class DotPrinter(private val out: PrintStream, private val graphName: String) : 
         }
     }
 
-    private fun Expression.printChildren(id: Int) = when (this) {
+    private fun Expression.printChildren(node: TreeNode) = when (this) {
         is BinaryExpression -> {
-            lhs.printTree(id)
-            rhs.printTree(id)
+            lhs.printTree(node.id)
+            rhs.printTree(node.id)
         }
         is ArrayReference -> {
-            name.printTree(id)
-            index.printTree(id)
+            name.printTree(node.id)
+            index.printTree(node.id)
         }
         is FunctionCall -> {
-            name.printTree(id)
-            args.printTree(id)
+            name.printTree(node.id)
+            args.printTree(node.id)
         }
-        is ParenExpression -> {
-            inner.printTree(id)
+        is ParenExpression -> inner.printTree(node.id)
+        is IdentifierValue -> this.id.printTree(node.id)
+        is StringLiteral -> node.value = "\"${escapeJava(value)}\""
+        is CharacterLiteral -> {
+            val escaped = escapeJava(value.toString())
+            node.value = "'${escaped.removeSurrounding("\"")}'"
         }
-        is IdentifierValue -> this.id.printTree(id)
-        is Literal<*> -> createNode(value as? String ?: value.toString(), id)
+        is Literal<*> -> node.value = value.toString()
     }
 }

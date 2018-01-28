@@ -187,8 +187,9 @@ class PrettyPrinter(private val out: PrintStream) : ASTConsumer<Unit> {
             emit('"')
         }
         is CharacterLiteral -> {
+            val escaped = escapeJava(expr.value.toString())
             emit('\'')
-            emit(expr.value)
+            emit(escaped.removeSurrounding("\""))
             emit('\'')
         }
         is Literal<*> -> emit(expr.value, nestingLevel)

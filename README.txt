@@ -2,10 +2,12 @@ The Unnamed Language
 
 # Building:
 Run `make` to generate the grammar, compile the source and bundle an executable jar (unnamed_language.jar).
+Run `make test` to kick off the automated JUnit test suite.
 
 # Running:
 Either run `unnamed-language.jar` or use the provided `ulc` script
-e.g. java -jar unnamed-language.jar <filename>
+e.g. java -jar unnamed-language.jar test.ul
+Passing the `-astgraph` flag will generate a DOT graph representation of the AST that can be passed to graphviz.
 
 # Compiler Internals:
 The compiler is written in a mix of Java and Kotlin.

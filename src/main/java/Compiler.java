@@ -9,21 +9,44 @@ import ast.ASTNode;
 import ast.DotPrinter;
 import ast.PrettyPrinter;
 import org.antlr.runtime.*;
+import org.apache.commons.cli.*;
 
 import java.io.*;
-import java.util.Scanner;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 
 public class Compiler {
     public static void main(String[] args) throws Exception {
-        ANTLRInputStream input;
+        Options options = new Options();
+        options.addOption("astgraph", "Generate a DOT-formatted AST tree for the input file");
 
-        if (args.length == 0) {
-            System.out.println("Usage: Test filename.ul");
+        CommandLineParser cliParser = new DefaultParser();
+        try {
+            CommandLine cmd = cliParser.parse(options, args);
+            boolean dumpAst = cmd.hasOption("astgraph");
+            List<String> restArgs = cmd.getArgList();
+
+            if (restArgs.size() < 1) {
+                printUsage(options);
+                return;
+            }
+            String fileName = restArgs.get(0);
+            compileFile(fileName, dumpAst);
+        } catch (UnrecognizedOptionException e) {
+            System.err.printf("ulc: invalid option: %s%n", e.getOption());
+            printUsage(options);
+        }
+    }
+
+    private static void compileFile(String fileName, boolean dumpAst) throws IOException {
+        Path filePath = Paths.get(fileName);
+        if (!Files.exists(filePath)) {
+            System.err.printf("file %s does not exist%n", fileName);
             return;
         }
-
-        String fileName = args[0];
-        input = new ANTLRInputStream(new FileInputStream(fileName));
+        ANTLRInputStream input = new ANTLRInputStream(new FileInputStream(fileName));
 
         // The name of the grammar here is "UnnamedLanguage",
         // so ANTLR generates UnnamedLanguageLexer and UnnamedLanguageParser
@@ -32,33 +55,29 @@ public class Compiler {
         UnnamedLanguageParser parser = new UnnamedLanguageParser(tokens);
 
         try {
+            // TODO don't pretty-print by default after we get proper type-checking and/or evaluation
             ASTNode program = parser.program();
             PrettyPrinter fmt = new PrettyPrinter(System.out);
             fmt.process(program);
 
-            final Process p = Runtime.getRuntime().exec("dot -Tpng -o ast.png");
-            try (OutputStream out = p.getOutputStream()) {
-                DotPrinter graph = new DotPrinter(new PrintStream(out));
+            if (dumpAst) {
+                File graphFile = new File(filePath.getFileName() + ".dot");
+                DotPrinter graph = new DotPrinter(new PrintStream(graphFile));
                 graph.process(program);
             }
-            new Thread(new Runnable() {
-                public void run() {
-                    InputStreamReader reader = new InputStreamReader(p.getErrorStream());
-                    Scanner scan = new Scanner(reader);
-                    while (scan.hasNextLine()) {
-                        System.err.println(scan.nextLine());
-                    }
-                }
-            }).start();
-            p.waitFor();
         } catch (RecognitionException e) {
-            // A lexical or parsing error occured.
+            // A lexical or parsing error occurred.
             // ANTLR will have already printed information on the
-            // console due to code added to the grammar.  So there is
-            // nothing to do here.
+            // console due to code added to the grammar,
+            // so there is nothing to do here.
         } catch (Exception e) {
             System.out.println(e);
             e.printStackTrace();
         }
+    }
+
+    private static void printUsage(Options options) {
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp("ulc <options> filename.ul", "Options:", options, "");
     }
 }
