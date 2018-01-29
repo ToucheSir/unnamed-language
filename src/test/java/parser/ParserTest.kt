@@ -12,7 +12,7 @@ import java.io.IOException
 import org.junit.Assert.*
 import type.*
 
-class ParserTestHarness {
+class ParserTest {
     // Happy path
     @Test
     fun testEmptyMain() {
