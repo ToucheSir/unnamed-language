@@ -1,21 +1,18 @@
-#
-ANT=ant/bin/ant
-GNAME= UnnamedLanguage
-GSRC= $(GNAME).g
+MVN=maven/bin/mvn
 
 all: compiler
 
 grammar:
-	$(ANT) antlr
+	$(MVN) antlr3:antlr
 
 compiler:
-	$(ANT) package-jar
+	$(MVN) assembly:assembly
 
 test:
-	$(ANT) test
+	$(MVN) test
 
 clean:
-	$(ANT) clean
+	$(MVN) clean
 
-
-
+devdist:
+	zip -r ulc.zip maven pom.xml Makefile ulc README.txt src
