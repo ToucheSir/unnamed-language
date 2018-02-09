@@ -2,7 +2,10 @@ package ast
 
 import type.Type
 
-sealed class ASTNode
+sealed class ASTNode {
+    var line: Int = 0
+    var offset: Int = 0
+}
 sealed class ASTNodeList<E : ASTNode>(val elements: MutableList<E>) : ASTNode() {
     val size get() = elements.size
     fun add(node: E) = elements.add(node)
