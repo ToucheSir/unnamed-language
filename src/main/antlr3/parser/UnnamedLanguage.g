@@ -27,6 +27,7 @@ tokens {
     package parser;
     import ast.*;
     import type.*;
+    import org.apache.commons.lang3.tuple.Pair;
     import static org.apache.commons.text.StringEscapeUtils.unescapeJava;
 }
 @lexer::header {
@@ -48,6 +49,10 @@ tokens {
     {
         reportError(e);
         throw e;
+    }
+    private void setLineOffset(ASTNode node, Token t) {
+        node.setLine(t.getLine());
+        node.setOffset(t.getCharPositionInLine());
     }
 }
 
@@ -116,19 +121,26 @@ varDecl returns [VariableDeclaration decl]
     ;
 
 compoundType returns [TypeNode tn]
-    @after { tn = new TypeNode(t); }
-    : t = type
-    | et = type '[' size = INTEGER_CONSTANT ']'
-    { t = new ArrayType(et, Integer.parseInt($size.text)); }
+    @init { Type t = null; }
+    @after {
+        tn = new TypeNode(t);
+        setLineOffset(tn, tp.getRight());
+    }
+    : tp = type
+    { t = tp.getLeft(); }
+    | tp = type '[' size = INTEGER_CONSTANT ']'
+    { t = new ArrayType(tp.getLeft(), Integer.parseInt($size.text)); }
     ;
 
-type returns [Type t]
-    : KW_INT     { t = IntegerType.INSTANCE; }
-    | KW_FLOAT   { t = FloatType.INSTANCE; }
-    | KW_CHAR    { t = CharType.INSTANCE; }
-    | KW_STRING  { t = StringType.INSTANCE; }
-    | KW_BOOLEAN { t = BooleanType.INSTANCE; }
-    | KW_VOID    { t = VoidType.INSTANCE; }
+type returns [Pair<Type, Token> p]
+    @init { Type t = null; }
+    @after { p = Pair.of(t, k); }
+    : k = KW_INT     { t = IntegerType.INSTANCE; }
+    | k = KW_FLOAT   { t = FloatType.INSTANCE; }
+    | k = KW_CHAR    { t = CharType.INSTANCE; }
+    | k = KW_STRING  { t = StringType.INSTANCE; }
+    | k = KW_BOOLEAN { t = BooleanType.INSTANCE; }
+    | k = KW_VOID    { t = VoidType.INSTANCE; }
     ;
     
 statement returns [Statement s] options {backtrack=true;}
@@ -220,12 +232,13 @@ atom returns [Expression e]
     ;
 
 literal returns [Literal l]
-    : s = STRING_CONSTANT    { l = new StringLiteral(unescapeJava($s.text.substring(1, $s.text.length() - 1))); }
-    | i = INTEGER_CONSTANT   { l = new IntegerLiteral(Integer.parseInt($i.text)); }
-    | f = FLOAT_CONSTANT     { l = new FloatLiteral(Float.parseFloat($f.text)); }
-    | c = CHARACTER_CONSTANT { l = new CharacterLiteral(unescapeJava($c.text).charAt(1)); }
-    | KW_TRUE                { l = new BooleanLiteral(true); }
-    | KW_FALSE               { l = new BooleanLiteral(false); }
+    @after { setLineOffset(l, $t); }
+    : t = STRING_CONSTANT    { l = new StringLiteral(unescapeJava($t.text.substring(1, $t.text.length() - 1))); }
+    | t = INTEGER_CONSTANT   { l = new IntegerLiteral(Integer.parseInt($t.text)); }
+    | t = FLOAT_CONSTANT     { l = new FloatLiteral(Float.parseFloat($t.text)); }
+    | t = CHARACTER_CONSTANT { l = new CharacterLiteral(unescapeJava($t.text).charAt(1)); }
+    | t = KW_TRUE            { l = new BooleanLiteral(true); }
+    | t = KW_FALSE           { l = new BooleanLiteral(false); }
     ;
 
 exprList returns [ExpressionList el]
@@ -241,6 +254,7 @@ exprMore returns [Expression e]
     ;
 
 identifier returns [Identifier id]
+    @after { setLineOffset(id, $name); }
     : name = ID
     { id = new Identifier($name.text); }
     ;
