@@ -10,7 +10,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <kotlin.version>1.2.21</kotlin.version>
+        <kotlin.version>1.1.1</kotlin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -73,7 +73,6 @@
                     <execution>
                         <configuration>
                             <sourceDirectory>src/main/antlr</sourceDirectory>
-                            <outputDirectory>target/generated-src/antlr</outputDirectory>
                         </configuration>
                         <goals>
                             <goal>antlr</goal>
