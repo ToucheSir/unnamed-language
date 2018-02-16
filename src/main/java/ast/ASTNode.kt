@@ -3,38 +3,64 @@ package ast
 import type.Type
 
 sealed class ASTNode {
-    var line: Int = 0
-    var offset: Int = 0
-}
-sealed class ASTNodeList<E : ASTNode>(val elements: MutableList<E>) : ASTNode() {
-    val size get() = elements.size
-    fun add(node: E) = elements.add(node)
-    inline fun forEach(action: (E) -> Unit) = elements.forEach(action)
-    inline fun forEachIndexed(action: (Int, E) -> Unit) = elements.forEachIndexed(action)
+    var line: Int = -1
+    var offset: Int = -1
 }
 
-data class Program(private val functions: MutableList<Function> = mutableListOf()) : ASTNodeList<Function>(functions)
+sealed class ASTNodeList<E : ASTNode>(private val elements: MutableList<E>) : ASTNode(), MutableList<E> by elements
 
-data class Function(val declaration: FunctionDeclaration, val body: FunctionBody) : ASTNode()
+data class Program(private val functions: MutableList<Function> = mutableListOf()) : ASTNodeList<Function>(functions) {
+    init {
+        line = 0
+        offset = 0
+    }
+}
+
+data class Function(val declaration: FunctionDeclaration, val body: FunctionBody) : ASTNode() {
+    init {
+        line = declaration.line
+        offset = declaration.offset
+    }
+}
 
 sealed class Declaration : ASTNode()
-data class FunctionDeclaration(val returnType: TypeNode,
-                               val name: Identifier,
-                               val parameters: FormalParameterList = FormalParameterList()) : Declaration()
+data class FunctionDeclaration(
+    val returnType: TypeNode,
+    val name: Identifier,
+    val parameters: FormalParameterList = FormalParameterList()
+) : Declaration() {
+    init {
+        line = returnType.line
+        offset = returnType.offset
+    }
+}
 
 data class TypeNode(val type: Type) : ASTNode()
 data class Identifier(val name: String) : ASTNode()
 
-data class FormalParameter(val type: TypeNode, val name: Identifier) : ASTNode()
-data class FormalParameterList(private val parameters: MutableList<FormalParameter> = mutableListOf()) : ASTNodeList<FormalParameter>(parameters)
+data class FormalParameter(val type: TypeNode, val name: Identifier) : ASTNode() {
+    init {
+        line = type.line
+        offset = type.offset
+    }
+}
 
-data class FunctionBody(val declarations: VariableDeclarationList = VariableDeclarationList(),
-                        val statements: StatementList = StatementList()) : ASTNode()
+data class FormalParameterList(private val parameters: MutableList<FormalParameter> = mutableListOf()) :
+    ASTNodeList<FormalParameter>(parameters)
 
-data class VariableDeclarationList(private val declarations: MutableList<VariableDeclaration> = mutableListOf()) : ASTNodeList<VariableDeclaration>(declarations)
+data class FunctionBody(
+    val declarations: VariableDeclarationList = VariableDeclarationList(),
+    val statements: StatementList = StatementList()
+) : ASTNode()
+
+data class VariableDeclarationList(private val declarations: MutableList<VariableDeclaration> = mutableListOf()) :
+    ASTNodeList<VariableDeclaration>(declarations)
+
 data class VariableDeclaration(val type: TypeNode, val name: Identifier) : Declaration()
 
-data class StatementList(private val statements: MutableList<Statement> = mutableListOf()) : ASTNodeList<Statement>(statements)
+data class StatementList(private val statements: MutableList<Statement> = mutableListOf()) :
+    ASTNodeList<Statement>(statements)
+
 sealed class Statement : ASTNode()
 
 data class IfStatement(val cond: Expression, val thenClause: Block, val elseClause: Block? = null) : Statement()
@@ -45,11 +71,15 @@ data class ReturnStatement(val returnValue: Expression?) : Statement()
 
 data class AssignmentStatement(val type: AssignmentType) : Statement()
 
-sealed class AssignmentType
-data class VariableAssignment(val name: Identifier, val value: Expression) : AssignmentType()
-data class ArrayAssignment(val name: Identifier,
-                           val index: Expression,
-                           val value: Expression) : AssignmentType()
+sealed class AssignmentType(open val name: Identifier, open val value: Expression)
+data class VariableAssignment(override val name: Identifier, override val value: Expression) :
+    AssignmentType(name, value)
+
+data class ArrayAssignment(
+    override val name: Identifier,
+    val index: Expression,
+    override val value: Expression
+) : AssignmentType(name, value)
 
 data class ExpressionStatement(val expr: Expression) : Statement()
 
@@ -63,10 +93,22 @@ data class SubtractExpression(override val lhs: Expression, override val rhs: Ex
 data class MultExpression(override val lhs: Expression, override val rhs: Expression) : BinaryExpression(lhs, rhs)
 
 data class ArrayReference(val name: Identifier, val index: Expression) : Expression()
-data class FunctionCall(val name: Identifier, val args: ExpressionList = ExpressionList()) : Expression()
-data class ExpressionList(private val expressions: MutableList<Expression> = mutableListOf()) : ASTNodeList<Expression>(expressions)
+data class FunctionCall(val name: Identifier, val args: ExpressionList = ExpressionList()) : Expression() {
+    init {
+        line = name.line
+        offset = name.offset
+    }
+}
+data class ExpressionList(private val expressions: MutableList<Expression> = mutableListOf()) :
+    ASTNodeList<Expression>(expressions)
+
 data class ParenExpression(val inner: Expression) : Expression()
-data class IdentifierValue(val id: Identifier) : Expression()
+data class IdentifierValue(val id: Identifier) : Expression() {
+    init {
+        line = id.line
+        offset = id.offset
+    }
+}
 
 sealed class Literal<out T>(open val value: T) : Expression()
 data class StringLiteral(override val value: String) : Literal<String>(value)

@@ -4,7 +4,7 @@ sealed class Type(val name: String) {
     override fun toString() = name
 }
 
-data class ArrayType(private val elementType: Type, private val size: Int) : Type(elementType.name) {
+data class ArrayType(val elementType: Type, val size: Int) : Type(elementType.name) {
     override fun toString() = "$elementType[$size]"
 }
 

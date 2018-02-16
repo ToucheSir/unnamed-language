@@ -172,7 +172,8 @@ printlnStatement returns [Statement s]
     { s = new PrintlnStatement(exp); }
     ;
 returnStatement returns [Statement s]
-    : KW_RETURN retVal = expr? ';'
+    @after { setLineOffset(s, $rkw); }
+    : rkw = KW_RETURN retVal = expr? ';'
     { s = new ReturnStatement(retVal); }
     ;
 assignmentStatement returns [Statement s]
@@ -219,15 +220,16 @@ exprMul returns [Expression e]
     ;
     
 atom returns [Expression e]
-    : name = identifier '[' index = expr ']'
+    @after { if (lb != null) setLineOffset(e, $lb); }
+    : name = identifier lb = '[' index = expr ']'
     { e = new ArrayReference(name, index); }
-    | name = identifier '(' expressions = exprList ')'
+    | name = identifier lb = '(' expressions = exprList ')'
     { e = new FunctionCall(name, expressions); }
     | id = identifier
     { e = new IdentifierValue(id); }
     | l = literal
     { e = l; }
-    | '(' exp = expr ')'
+    | lb = '(' exp = expr ')'
     { e = new ParenExpression(exp); }
     ;
 
