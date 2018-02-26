@@ -189,17 +189,23 @@ expressionStatement returns [Statement s]
 
 block returns [Block b]
     @init { b = new Block(); }
-    : '{' (s = statement { b.add(s); })* '}'
+    : '{' (s = statement { if (s != null) b.add(s); })* '}'
     ;
 
 expr returns [Expression e]
     : lhs = exprLessThan { e = lhs; }
-    (OP_EQUALS rhs = exprLessThan { e = new EqualityExpression(e, rhs); })*
+    (op = OP_EQUALS rhs = exprLessThan {
+        e = new EqualityExpression(e, rhs);
+        setLineOffset(e, $op);
+    })*
     ;
 
 exprLessThan returns [Expression e]
     : lhs = exprPlusMinus { e = lhs; }
-    (OP_LESSTHAN rhs = exprPlusMinus { e = new LessThanExpression(e, rhs); })*
+    (op = OP_LESSTHAN rhs = exprPlusMinus {
+        e = new LessThanExpression(e, rhs);
+        setLineOffset(e, $op);
+    })*
     ;
 
 exprPlusMinus returns [Expression e]
@@ -210,12 +216,14 @@ exprPlusMinus returns [Expression e]
         } else if ($op.type == OP_MINUS) {
             e = new SubtractExpression(e, rhs);
         }
+        setLineOffset(e, $op);
     })*
     ;
 
 exprMul returns [Expression e]
-    : lhs = atom { e = lhs; } (OP_MUL rhs = atom {
+    : lhs = atom { e = lhs; } (op = OP_MUL rhs = atom {
         e = new MultExpression(e, rhs);
+        setLineOffset(e, $op);
     })*
     ;
     

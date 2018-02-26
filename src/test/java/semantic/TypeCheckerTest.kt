@@ -415,107 +415,50 @@ class TypeCheckerTest {
     )
 
     @Test
-    fun `5-2 An array index expression must have type int`() = check(
-        """
-        void main() {
-            int[1] a;
-            a[foo()];
-        }
-        string foo() { return ""; }
-        """.trimIndent(),
-        "cannot index array with expression of type string", 3, 9
-    )
+    fun `5-2 An array index expression must have type int`() {
+        check(
+            """
+            void main() {
+                int[1] a;
+                a[foo()];
+            }
+            string foo() { return ""; }
+            """.trimIndent(),
+            "cannot index array with expression of type string", 3, 9
+        )
+        check(
+            """
+            void main() {
+                int[1] a;
+                a[bar()];
+            }
+            int bar() { return 0; }
+            """.trimIndent()
+        )
+    }
 
-    /*
-(5) The type of hhhj
-containing function.
-(6) For an assignment e 1 =e 2 ,
-type(e 1 ) ≥ type(e 2 )
-3.2. Expressions.
-(1) For an array index expression e,
-type(e) = int
-(2) For an expression e 1 ⊕ e 2 :
-(a) If ⊕ is +:
-int
-float
-int
-int
-float
-float
-char
-string
-boolean
-void
-char
-string
-boolean void
-boolean void
-char
-string
-(b) If ⊕ is -:
-int
-float
-char
-string
-boolean
-void
-int
-int
-float
-char
-string
-float
-char
-2(c) If ⊕ is *:
-int
-float
-char
-string
-boolean
-void
-int
-int
-float
-char string boolean void
-char string boolean void
-float
-(d) If ⊕ is <:
-int
-float
-char
-string
-boolean
-void
-int
-boolean
-float
-boolean
-boolean
-boolean
-boolean
-(e) If ⊕ is ==:
-int
-float
-char
-string
-boolean
-void
-int
-boolean
-float
-char
-string
-boolean
-void
-boolean
-boolean
-boolean
-boolean
-(3) For an invocation of function f,
-(a) The number of arguments in the invocation must match the number of parameters n, in the
-function f.
-(b) Denote the parameters of f as p i , i ≤ n. Similarly, denote the arguments of a call to f as a i ,
-i ≤ n. For each i, we must have
-type(a i ) ≤ type(p i )
-     */
+    @Test
+    fun `5-3 An add expression must have have the correct operand and result types`() {
+        val types = arrayOf(IntegerType, FloatType, CharType, StringType, BooleanType)
+        val typeTable = arrayOf(
+            Triple(IntegerType, IntegerType, IntegerType)
+        )
+        val op = "+"
+        val template =
+            """
+            void main() {
+            ${types.joinToString("\n") { "$it ${it}Var;" }}
+                %s
+            }
+            """
+        for (t1 in types) for (t2 in types) types
+            .filter { Triple(t1, t2, it) !in typeTable }
+            .forEach {
+                check(
+                    template.format("${it}Var = ${t1}Var $op ${t2}Var;"),
+                    "cannot apply operator $op to types $t1 and $t2",
+                    7, "    ${it}Var = ${t1}Var ".length
+                )
+            }
+    }
 }
