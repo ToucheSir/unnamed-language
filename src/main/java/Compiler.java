@@ -12,6 +12,8 @@ import org.antlr.runtime.*;
 import org.apache.commons.cli.*;
 import parser.UnnamedLanguageLexer;
 import parser.UnnamedLanguageParser;
+import semantic.SemanticException;
+import semantic.TypeChecker;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -59,9 +61,10 @@ public class Compiler {
         try {
             // TODO don't pretty-print by default after we get proper type-checking and/or evaluation
             ASTNode program = parser.program();
-            PrettyPrinter fmt = new PrettyPrinter(System.out);
-            fmt.process(program);
-
+//            PrettyPrinter fmt = new PrettyPrinter(System.out);
+//            fmt.process(program);
+            TypeChecker typeChecker = new TypeChecker();
+            typeChecker.process(program);
             if (dumpAst) {
                 File graphFile = new File(filePath.getFileName() + ".dot");
                 DotPrinter graph = new DotPrinter(new PrintStream(graphFile));
@@ -72,6 +75,8 @@ public class Compiler {
             // ANTLR will have already printed information on the
             // console due to code added to the grammar,
             // so there is nothing to do here.
+        } catch (SemanticException e) {
+            System.out.printf("Error:%d:%d:%s", e.getLine(), e.getCol(), e.getMessage());
         } catch (Exception e) {
             System.out.println(e);
             e.printStackTrace();
