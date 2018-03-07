@@ -42,7 +42,7 @@ class DotPrinter(private val out: PrintStream, private val graphName: String) : 
             val id = node.id
             run {
                 when (this) {
-                    is Program -> forEach { it.printTree(id) }
+                    is Program -> this.forEach { it.printTree(id) }
                     is Function -> {
                         declaration.printTree(id)
                         body.printTree(id)
@@ -58,7 +58,7 @@ class DotPrinter(private val out: PrintStream, private val graphName: String) : 
                     }
                     is TypeNode -> node.value = type.name
                     is Identifier -> node.value = name
-                    is FormalParameterList -> forEach { it.printTree(id) }
+                    is FormalParameterList -> this.forEach { it.printTree(id) }
                     is FormalParameter -> {
                         type.printTree(id)
                         name.printTree(id)
@@ -67,12 +67,12 @@ class DotPrinter(private val out: PrintStream, private val graphName: String) : 
                         declarations.printTree(id)
                         statements.printTree(id)
                     }
-                    is VariableDeclarationList -> forEach { it.printTree(id) }
-                    is StatementList -> forEach { it.printTree(id) }
+                    is VariableDeclarationList -> this.forEach { it.printTree(id) }
+                    is StatementList -> this.forEach { it.printTree(id) }
                     is Statement -> printChildren(id)
-                    is Block -> forEach { it.printTree(id) }
+                    is Block -> this.forEach { it.printTree(id) }
                     is Expression -> printChildren(node)
-                    is ExpressionList -> forEach { it.printTree(id) }
+                    is ExpressionList -> this.forEach { it.printTree(id) }
                 }
             }
         }

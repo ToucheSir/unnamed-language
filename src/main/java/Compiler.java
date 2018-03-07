@@ -76,7 +76,7 @@ public class Compiler {
             // console due to code added to the grammar,
             // so there is nothing to do here.
         } catch (SemanticException e) {
-            System.out.printf("Error:%d:%d:%s", e.getLine(), e.getCol(), e.getMessage());
+            System.out.printf("Error:%d:%d:%s%n", e.getLine(), e.getCol(), e.getMessage());
         } catch (Exception e) {
             System.out.println(e);
             e.printStackTrace();

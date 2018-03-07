@@ -207,16 +207,16 @@ class TypeChecker : ASTConsumer<Unit> {
             t.elementType
         }
         is FunctionCall -> {
-            val t = rootEnv.lookupOrFail(exp.name)
+            val t = rootEnv.lookup(exp.name)
             val ft = when (t) {
                 is FunctionType -> t
-                else -> throw TypeCheckException("value of type $t is not a function", exp)
+                else -> throw TypeCheckException("only functions may be invoked", exp)
             }
             val argTypes = exp.args.map { resolveType(it, env) }
             if (argTypes.size != ft.parameterTypes.size) {
                 throw TypeCheckException(
-                    "function ${exp.name.name} called with incorrect number of arguments" +
-                            "(expected ${ft.parameterTypes.joinToString()}, actual ${argTypes.joinToString()})", exp
+                    "function ${exp.name.name} called with incorrect number of arguments " +
+                            "(expected: ${ft.parameterTypes.joinToString()} - actual: ${argTypes.joinToString()})", exp
                 )
             }
             ft.parameterTypes.zip(argTypes).forEachIndexed { i, (param, arg) ->

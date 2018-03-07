@@ -3,4 +3,4 @@
 # Taken from https://stackoverflow.com/a/246128
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-java -jar $DIR/unnamed_language.jar "$@"
+java -jar $DIR/target/unnamed-language-0.0.1-jar-with-dependencies.jar "$@"

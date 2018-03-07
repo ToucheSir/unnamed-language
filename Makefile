@@ -15,4 +15,4 @@ clean:
 	$(MVN) clean
 
 devdist:
-	zip -r ulc.zip maven pom.xml Makefile ulc README.txt src
+	zip -r ulc.zip maven pom.xml Makefile ulc README.txt src tests

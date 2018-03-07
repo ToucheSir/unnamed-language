@@ -437,28 +437,120 @@ class TypeCheckerTest {
         )
     }
 
-    @Test
-    fun `5-3 An add expression must have have the correct operand and result types`() {
+    private fun checkOperator(op: String, typeTable: Map<Pair<Type, Type>, Type>) {
         val types = arrayOf(IntegerType, FloatType, CharType, StringType, BooleanType)
-        val typeTable = arrayOf(
-            Triple(IntegerType, IntegerType, IntegerType)
-        )
-        val op = "+"
         val template =
             """
             void main() {
-            ${types.joinToString("\n") { "$it ${it}Var;" }}
+                ${types.joinToString(" ") { "$it ${it}Var;" }}
                 %s
             }
+            """.trimIndent()
+        for (t1 in types) for (t2 in types) if (Pair(t1, t2) !in typeTable) {
+            val tpl = template.format("${t1}Var $op ${t2}Var;")
+            check(
+                tpl,
+                "cannot apply operator $op to types $t1 and $t2",
+                3, "    ${t1}Var ".length
+            )
+        }
+        for ((operands, res) in typeTable.entries) {
+            val (t1, t2) = operands
+            val tpl = template.format("${res}Var = ${t1}Var $op ${t2}Var;")
+            check(tpl)
+        }
+    }
+
+    @Test
+    fun `5-3 The plus operator must have have the correct operand and result types`() {
+        val typeTable = mutableMapOf<Pair<Type, Type>, Type>()
+        typeTable[Pair(IntegerType, IntegerType)] = IntegerType
+        typeTable[Pair(FloatType, FloatType)] = FloatType
+        typeTable[Pair(CharType, CharType)] = CharType
+        typeTable[Pair(StringType, StringType)] = StringType
+
+        checkOperator("+", typeTable)
+    }
+
+    @Test
+    fun `5-4 The minus operator have have the correct operand and result types`() {
+        val typeTable = mutableMapOf<Pair<Type, Type>, Type>()
+        typeTable[Pair(IntegerType, IntegerType)] = IntegerType
+        typeTable[Pair(FloatType, FloatType)] = FloatType
+        typeTable[Pair(CharType, CharType)] = CharType
+
+        checkOperator("-", typeTable)
+    }
+
+    @Test
+    fun `5-5 The multiply operator have have the correct operand and result types`() {
+        val typeTable = mutableMapOf<Pair<Type, Type>, Type>()
+        typeTable[Pair(IntegerType, IntegerType)] = IntegerType
+        typeTable[Pair(FloatType, FloatType)] = FloatType
+
+        checkOperator("*", typeTable)
+    }
+
+    @Test
+    fun `5-6 The less than operator have have the correct operand and result types`() {
+        val typeTable = mutableMapOf<Pair<Type, Type>, Type>()
+        typeTable[Pair(IntegerType, IntegerType)] = BooleanType
+        typeTable[Pair(FloatType, FloatType)] = BooleanType
+        typeTable[Pair(CharType, CharType)] = BooleanType
+        typeTable[Pair(StringType, StringType)] = BooleanType
+        typeTable[Pair(BooleanType, BooleanType)] = BooleanType
+
+        checkOperator("<", typeTable)
+    }
+
+    @Test
+    fun `5-7 The equals operator have have the correct operand and result types`() {
+        val typeTable = mutableMapOf<Pair<Type, Type>, Type>()
+        typeTable[Pair(IntegerType, IntegerType)] = BooleanType
+        typeTable[Pair(FloatType, FloatType)] = BooleanType
+        typeTable[Pair(CharType, CharType)] = BooleanType
+        typeTable[Pair(StringType, StringType)] = BooleanType
+        typeTable[Pair(BooleanType, BooleanType)] = BooleanType
+
+        checkOperator("==", typeTable)
+    }
+
+    @Test
+    fun `5-8 Only functions may be invoked`() {
+        check(
             """
-        for (t1 in types) for (t2 in types) types
-            .filter { Triple(t1, t2, it) !in typeTable }
-            .forEach {
-                check(
-                    template.format("${it}Var = ${t1}Var $op ${t2}Var;"),
-                    "cannot apply operator $op to types $t1 and $t2",
-                    7, "    ${it}Var = ${t1}Var ".length
-                )
+            void main() {
+                int a;
+                a();
             }
+            """.trimIndent(), "only functions may be invoked", 3, 5
+        )
+    }
+
+    @Test
+    fun `5-9 Function arguments must be the right length and the correct types`() {
+        check(
+            """
+            void foo(string a, char b) {}
+            void main() {
+                foo("1", 'c', true);
+            }
+            """.trimIndent(),
+            "function foo called with incorrect number of arguments (expected: string, char - actual: string, char, boolean)",
+            3,
+            7
+        )
+
+        check(
+            """
+            void foo(string a, char b) {}
+            void main() {
+                foo("1", true);
+            }
+            """.trimIndent(),
+            "parameter has type char, boolean given",
+            3,
+            13
+        )
     }
 }
