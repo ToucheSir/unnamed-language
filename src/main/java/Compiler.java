@@ -8,6 +8,9 @@
 import ast.ASTNode;
 import ast.DotPrinter;
 import ast.PrettyPrinter;
+import ast.ir.IRGenerator;
+import ast.ir.IRPrinter;
+import ast.ir.IRProgram;
 import org.antlr.runtime.*;
 import org.apache.commons.cli.*;
 import parser.UnnamedLanguageLexer;
@@ -65,11 +68,16 @@ public class Compiler {
 //            fmt.process(program);
             TypeChecker typeChecker = new TypeChecker();
             typeChecker.process(program);
+
             if (dumpAst) {
                 File graphFile = new File(filePath.getFileName() + ".dot");
                 DotPrinter graph = new DotPrinter(new PrintStream(graphFile));
                 graph.process(program);
             }
+
+            IRGenerator irGenerator = new IRGenerator();
+            IRProgram irProgram = irGenerator.process(program);
+            new IRPrinter(System.out).print(irProgram);
         } catch (RecognitionException e) {
             // A lexical or parsing error occurred.
             // ANTLR will have already printed information on the
