@@ -7,10 +7,10 @@
 
 import ast.ASTNode;
 import ast.DotPrinter;
-import ast.PrettyPrinter;
-import ast.ir.IRGenerator;
-import ast.ir.IRPrinter;
-import ast.ir.IRProgram;
+import codegen.JavaCodeGenerator;
+import ir.IRGenerator;
+import ir.IRPrinter;
+import ir.IRProgram;
 import org.antlr.runtime.*;
 import org.apache.commons.cli.*;
 import parser.UnnamedLanguageLexer;
@@ -77,7 +77,8 @@ public class Compiler {
 
             IRGenerator irGenerator = new IRGenerator();
             IRProgram irProgram = irGenerator.process(program);
-            new IRPrinter(System.out).print(irProgram);
+//            new IRPrinter(System.out).print(irProgram);
+            new JavaCodeGenerator(System.out).generate(irProgram);
         } catch (RecognitionException e) {
             // A lexical or parsing error occurred.
             // ANTLR will have already printed information on the

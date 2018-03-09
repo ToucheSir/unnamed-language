@@ -1,0 +1,4 @@
+package codegen
+
+class JavaCodeGenerator {
+}
