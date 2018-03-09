@@ -73,14 +73,13 @@ class JVMCodeGenerator(val out: OutputStream) : CodeGenerator {
             when (it) {
                 is IRLoadImmediate<*> -> {
                     mv.visitLdcInsn(it.value)
+
                     val (loadOp, storeOp) = when (it.tmp.type) {
                         IntegerType, CharType -> Pair(ILOAD, ISTORE)
                         FloatType -> Pair(FLOAD, FSTORE)
                         else -> Pair(ALOAD, ASTORE)
                     }
-                    System.err.println(it.tmp.type)
                     mv.visitVarInsn(storeOp, it.tmp.id)
-//                    mv.visitVarInsn(ISTORE, it.tmp.id)
                 }
                 is IRInitArray -> {
                     val aType = it.tmp.type as ArrayType
@@ -143,7 +142,7 @@ class JVMCodeGenerator(val out: OutputStream) : CodeGenerator {
 //                    mv.visitInsn(storeOp)
                 } else {
                     val (loadOp, storeOp) = when (it.dest.type) {
-                        IntegerType -> Pair(ILOAD, ISTORE)
+                        IntegerType, CharType -> Pair(ILOAD, ISTORE)
                         FloatType -> Pair(FLOAD, FSTORE)
                         else -> Pair(0, 0)
                     }
