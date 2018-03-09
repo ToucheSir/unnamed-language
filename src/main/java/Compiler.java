@@ -7,7 +7,7 @@
 
 import ast.ASTNode;
 import ast.DotPrinter;
-import codegen.JavaCodeGenerator;
+import codegen.JVMCodeGenerator;
 import ir.IRGenerator;
 import ir.IRPrinter;
 import ir.IRProgram;
@@ -77,8 +77,8 @@ public class Compiler {
 
             IRGenerator irGenerator = new IRGenerator();
             IRProgram irProgram = irGenerator.process(program);
-//            new IRPrinter(System.out).print(irProgram);
-            new JavaCodeGenerator(System.out).generate(irProgram);
+            new IRPrinter(System.out).print(irProgram);
+            new JVMCodeGenerator(new FileOutputStream(new File("ULMain.class"))).generate(irProgram);
         } catch (RecognitionException e) {
             // A lexical or parsing error occurred.
             // ANTLR will have already printed information on the
