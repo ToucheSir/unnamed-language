@@ -6,6 +6,7 @@ import semantic.TypeCheckException
 import type.*
 import util.ignore
 import java.io.PrintStream
+import java.nio.file.Path
 
 data class Temporary(val id: Int, val type: Type, val name: String? = null) {
     override fun toString() = "T$id"
@@ -31,7 +32,9 @@ class TempAllocator {
     operator fun get(name: String) = params.find { it.name == name } ?: locals.find { it.name == name }
 }
 
-data class IRProgram(val functions: MutableList<IRFunction> = mutableListOf()) : MutableList<IRFunction> by functions
+data class IRProgram(val name: String, val functions: MutableList<IRFunction> = mutableListOf()) :
+    MutableList<IRFunction> by functions
+
 data class IRFunctionTemporaries(val params: List<Temporary>, val locals: List<Temporary>, val temps: List<Temporary>) :
     Iterable<Temporary> by (params + locals + temps)
 
@@ -88,9 +91,9 @@ private fun BinaryExpression.toIROperator(): IRBinOp = when (this) {
     is MultExpression -> IRBinOp.MULTIPLY
 }
 
-class IRGenerator : ASTConsumer<IRProgram> {
+class IRGenerator(programName: String) : ASTConsumer<IRProgram> {
     private val rootEnv = Environment()
-    private val program = IRProgram()
+    private val program = IRProgram(programName)
 
     override fun process(node: ASTNode): IRProgram {
         generateIR(node)
@@ -223,7 +226,12 @@ class IRGenerator : ASTConsumer<IRProgram> {
                 NullTemporary
             } else {
                 val retVal = temps.allocateTemp(returnType)
-                func.instructions += IRFunctionCall(exp.name.name, args, retVal)
+                // FIXME HACK! use "fdiv" intrinsic (this should be moved to codegen, perhaps?)
+                if (exp.name.name == "fdiv") {
+                    func.instructions += IRBinaryOp(IRBinOp.DIVIDE, args[0], args[1], retVal)
+                } else {
+                    func.instructions += IRFunctionCall(exp.name.name, args, retVal)
+                }
                 retVal
             }
         }
