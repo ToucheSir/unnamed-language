@@ -144,7 +144,7 @@ class IRGenerator : ASTConsumer<IRProgram> {
         is StatementList -> node.forEach { generateIR(it, func, temps, labelFactory) }
         is IfStatement -> {
             val cond = generateExpressionIR(node.cond, func, temps)
-            val cmp = temps.allocateTemp(cond.type)
+            val cmp = temps.allocateTemp(BooleanType)
             func.instructions += IRAssignment(cmp, cond)
             func.instructions += IRUnaryOp(IRUnOp.NOT, cmp, cmp)
 
@@ -162,7 +162,7 @@ class IRGenerator : ASTConsumer<IRProgram> {
             func.instructions += startLabel
 
             val cond = generateExpressionIR(node.cond, func, temps)
-            val cmp = temps.allocateTemp(cond.type)
+            val cmp = temps.allocateTemp(BooleanType)
             func.instructions += IRAssignment(cmp, cond)
             func.instructions += IRUnaryOp(IRUnOp.NOT, cmp, cmp)
 
@@ -203,7 +203,8 @@ class IRGenerator : ASTConsumer<IRProgram> {
         is BinaryExpression -> {
             val lhs = generateExpressionIR(exp.lhs, func, temps)
             val rhs = generateExpressionIR(exp.rhs, func, temps)
-            temps.allocateTemp(lhs.type).also {
+            val resType = if (exp is LessThanExpression || exp is EqualityExpression) BooleanType else lhs.type
+            temps.allocateTemp(resType).also {
                 func.instructions.add(IRBinaryOp(exp.toIROperator(), lhs, rhs, it))
             }
         }
