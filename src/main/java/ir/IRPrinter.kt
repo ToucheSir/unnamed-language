@@ -7,7 +7,7 @@ import java.io.PrintStream
 class IRPrinter(val out: PrintStream) {
     fun print(program: IRProgram) {
         // TODO pass in program name from IR Node
-        out.println("PROG ULMain")
+        out.println("PROG ${program.name}")
         program.functions.forEach(this::print)
     }
 

@@ -1,0 +1,73 @@
+int band(int a, int b) {
+    // STUB
+    return 0;
+}
+
+float fdiv(float a, float b) {
+    // STUB
+    return 0.0;
+}
+
+boolean and(boolean a, boolean b) {
+    if (a) {
+        return b;
+    }
+    return false;
+}
+
+int iid(int i) {
+    return i;
+}
+
+void populateCharTable(char[15] chars) {
+    chars[0] = ' ';
+    chars[1] = '.';
+    chars[2] = ':';
+    chars[3] = '-';
+    chars[4] = ';';
+    chars[5] = '!';
+    chars[6] = '/';
+    chars[7] = '>';
+    chars[8] = ')';
+    chars[9] = '|';
+    chars[10] = '&';
+    chars[11] = 'I';
+    chars[12] = 'H';
+    chars[12] = '%';
+    chars[13] = '*';
+    chars[14] = '#';
+}
+
+void main()
+{
+    int a;
+    int b;
+    int k;
+    float i;
+    float j;
+    float r;
+    float x;
+    float y;
+    char[15] chars; // " .:-;!/>)|&IH%*#"
+    a = 0;
+    b = 0;
+    i = 0.0;
+    j = 2.3;
+    k = 1;
+    k = a + b;
+    r = i + j;
+    populateCharTable(chars);
+
+    while (a < 15) {
+        print chars[a];
+        a = a + 1;
+    }
+    println "";
+    while (i < 15.0) {
+        println "";
+        i = i + 1.0;
+    }
+
+    print "Hello, World";
+    println chars[5];
+}

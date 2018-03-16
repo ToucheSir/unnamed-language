@@ -75,19 +75,22 @@ public class Compiler {
                 graph.process(program);
             }
 
-            IRGenerator irGenerator = new IRGenerator();
+            String programName = filePath.getFileName().toString().replaceFirst("[.][^.]+$", "");
+            IRGenerator irGenerator = new IRGenerator(programName);
             IRProgram irProgram = irGenerator.process(program);
             new IRPrinter(System.out).print(irProgram);
-            new JVMCodeGenerator(new FileOutputStream(new File("ULMain.class"))).generate(irProgram);
+            new JVMCodeGenerator(programName, new FileOutputStream(new File(programName + ".class"))).generate(irProgram);
         } catch (RecognitionException e) {
             // A lexical or parsing error occurred.
             // ANTLR will have already printed information on the
             // console due to code added to the grammar,
             // so there is nothing to do here.
+            System.exit(1);
         } catch (SemanticException e) {
-            System.out.printf("Error:%d:%d:%s%n", e.getLine(), e.getCol(), e.getMessage());
+            System.err.printf("Error:%d:%d:%s%n", e.getLine(), e.getCol(), e.getMessage());
+            System.exit(1);
         } catch (Exception e) {
-            System.out.println(e);
+            System.err.println(e);
             e.printStackTrace();
         }
     }

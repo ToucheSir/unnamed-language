@@ -1,0 +1,66 @@
+void createCowText(string[5] cow, int spaceWidth) {
+  string space;
+  space = " ";
+  cow[0] = repeatStr(space, spaceWidth) + "\\   ^__^";
+  cow[1] = repeatStr(space, spaceWidth) + " \\  (oo)\\_______";
+  cow[2] = repeatStr(space, spaceWidth) + "    (__)\\       )\\/\\";
+  cow[3] = repeatStr(space, spaceWidth) + "        ||----w |";
+  cow[4] = repeatStr(space, spaceWidth) + "        ||     ||";
+}
+
+string repeatStr(string s, int n) {
+  int i;
+  string res;
+  i = 0;
+  res = "";
+  while (i < n) {
+    res = res + s;
+    i = i + 1;
+  }
+  return res;
+}
+
+boolean lte(int a, int b) {
+  if (a < b) {
+    return true;
+  }
+  if (a == b) {
+    return true;
+  }
+  return false;
+}
+
+int idiv(int a, int b) {
+  int res;
+  res = 0;
+  while (lte(b, a)) {
+    a = a - b;
+    res = res + 1;
+  }
+  return res;
+}
+
+void main() {
+  string text;
+  int textWidth;
+  string[5] cow;
+  int i;
+
+  text = "srsly dude, why?";
+  textWidth = 4;
+  createCowText(cow, idiv(textWidth, 2) + 1);
+
+  print(' ');
+  println(repeatStr("_", textWidth + 2));
+  print("< ");
+  print(text);
+  println(" >");
+  print(' ');
+  println(repeatStr("-", textWidth + 2));
+
+  i = 0;
+  while (i < 5) {
+    println cow[i];
+    i = i + 1;
+  }
+}

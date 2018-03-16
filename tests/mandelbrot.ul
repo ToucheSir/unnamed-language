@@ -1,6 +1,22 @@
 int band(int a, int b) {
     // STUB
-    return 0;
+    int i;
+    int c;
+    c = 0;
+
+    while (i < 32) {
+        c = 2 * c;
+        if (a < 0) {
+            if (b < 0) {
+                c = c + 1;
+            }
+        }
+        a = 2 * a;
+        b = 2 * b;
+
+        i = i + 1;
+    }
+    return c;
 }
 
 float fdiv(float a, float b) {
@@ -15,7 +31,7 @@ boolean and(boolean a, boolean b) {
     return false;
 }
 
-void populateCharTable(char[15] chars) {
+void populateCharTable(char[16] chars) {
     chars[0] = ' ';
     chars[1] = '.';
     chars[2] = ':';
@@ -29,9 +45,9 @@ void populateCharTable(char[15] chars) {
     chars[10] = '&';
     chars[11] = 'I';
     chars[12] = 'H';
-    chars[12] = '%';
-    chars[13] = '*';
-    chars[14] = '#';
+    chars[13] = '%';
+    chars[14] = '*';
+    chars[15] = '#';
 }
 
 void main()
@@ -42,7 +58,7 @@ void main()
     float r;
     float x;
     float y;
-    char[15] chars; // " .:-;!/>)|&IH%*#"
+    char[16] chars; // " .:-;!/>)|&IH%*#"
     k = 1;
     y = 0.0-16.0;
     populateCharTable(chars);
@@ -70,11 +86,14 @@ void main()
 
             print chars[band(k, 15)];
         }
+        println "";
+    }
+//    float i, j, r, x, y = -16;
+//    while (puts(""), y++ < 15)
 //        for (x
 //             = 0;
-//             x++ < 84; )
+//             x++ < 84; putchar(" .:-;!/>)|&IH%*#"[k & 15]))
 //            for (i = k = r = 0;
 //                 j = r * r - i * i - 2 + x / 25, i = 2 * r * i + y / 10, j * j + i * i < 11 && k++ < 111; r = j)
 //                ;
-    }
 }

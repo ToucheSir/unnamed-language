@@ -9,14 +9,14 @@ import org.objectweb.asm.Type.*
 import type.*
 import java.io.OutputStream
 
-class JVMCodeGenerator(val out: OutputStream) : CodeGenerator {
+class JVMCodeGenerator(val programName: String, val out: OutputStream) : CodeGenerator {
     private val cw = ClassWriter(ClassWriter.COMPUTE_MAXS or ClassWriter.COMPUTE_FRAMES)
 
     override fun generate(program: IRProgram) {
         cw.visit(
             V1_6,
             ACC_PUBLIC,
-            "ULMain",
+            programName,
             null,
             getInternalName(Object::class.java),
             emptyArray()

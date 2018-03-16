@@ -8,3 +8,8 @@ lib/
 unnamed_language.jar
 maven
 target
+
+tests/*.class
+*.j
+*.ir
+
