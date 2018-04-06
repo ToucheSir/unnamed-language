@@ -129,6 +129,7 @@ class JVMCodeGenerator(val programName: String, val out: OutputStream) : CodeGen
                     mv.visitVarInsn(storeOp, it.res.id)
                 }
                 is IRBinaryOp -> {
+                    // FIXME this is horrendous
                     val (loadOp, storeOp) = when (it.lhs.type) {
                         IntegerType, CharType, BooleanType -> Pair(ILOAD, ISTORE)
                         FloatType -> Pair(FLOAD, FSTORE)
@@ -138,6 +139,11 @@ class JVMCodeGenerator(val programName: String, val out: OutputStream) : CodeGen
                     val (addOp, subOp, mulOp) = when (it.lhs.type) {
                         IntegerType, CharType, BooleanType -> Triple(IADD, ISUB, IMUL)
                         FloatType -> Triple(FADD, FSUB, FMUL)
+                        else -> throw UnsupportedOperationException()
+                    }
+                    val divOp = when (it.lhs.type) {
+                        IntegerType, CharType, BooleanType -> IDIV
+                        FloatType -> FDIV
                         else -> throw UnsupportedOperationException()
                     }
                     when (it.operator) {
@@ -159,7 +165,12 @@ class JVMCodeGenerator(val programName: String, val out: OutputStream) : CodeGen
                             mv.visitInsn(mulOp)
                             mv.visitVarInsn(storeOp, it.res.id)
                         }
-                        IRBinOp.DIVIDE -> TODO()
+                        IRBinOp.DIVIDE -> {
+                            mv.visitVarInsn(loadOp, it.lhs.id)
+                            mv.visitVarInsn(loadOp, it.rhs.id)
+                            mv.visitInsn(divOp)
+                            mv.visitVarInsn(storeOp, it.res.id)
+                        }
                         IRBinOp.REMAINDER -> TODO()
                         IRBinOp.LESSTHAN -> {
                             mv.visitVarInsn(loadOp, it.lhs.id)
