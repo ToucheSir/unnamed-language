@@ -2,6 +2,7 @@ int band(int a, int b) {
     // STUB
     int i;
     int c;
+    i = 0;
     c = 0;
 
     while (i < 32) {

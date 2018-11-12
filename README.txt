@@ -7,9 +7,11 @@ Run `make test` to kick off the automated JUnit test suite.
 # Running:
 Either run `unnamed-language.jar` or use the provided `ulc` script
 e.g. java -jar unnamed-language.jar test.ul
-The compiler will print (to stdout) a textual representation of the IR that may be further passed to the "codegen" tool.
+The compiler will generate a class file (e.g. test.class) of the same name.
 
-## Flags
+***NOTE: This compiler generates class files directly and not jasmin or any other textual representation!
+
+## Compiler CLI Options
 Passing the `-astgraph` flag will generate a DOT graph representation of the AST that can be passed to graphviz.
 
 # Compiler Internals:

@@ -7,6 +7,7 @@
 
 import ast.ASTNode;
 import ast.DotPrinter;
+import codegen.JVMCodeGenerator;
 import ir.IRGenerator;
 import ir.IRPrinter;
 import ir.IRProgram;
@@ -77,8 +78,8 @@ public class Compiler {
             String programName = filePath.getFileName().toString().replaceFirst("[.][^.]+$", "");
             IRGenerator irGenerator = new IRGenerator(programName);
             IRProgram irProgram = irGenerator.process(program);
-            new IRPrinter(System.out).print(irProgram);
-//            new JavaCodeGenerator(System.out).generate(irProgram);
+//            new IRPrinter(System.out).print(irProgram);
+            new JVMCodeGenerator(programName, new FileOutputStream(new File(programName + ".class"))).generate(irProgram);
         } catch (RecognitionException e) {
             // A lexical or parsing error occurred.
             // ANTLR will have already printed information on the
